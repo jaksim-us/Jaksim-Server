@@ -24,4 +24,11 @@ public class User extends BaseTimeEntity {
     private Platform platform;
     private String refreshToken;
 
+    public static User createUser(String email, String name) {
+        return User.builder()
+                .email(email)
+                .name(name)
+                .platform(Platform.GOOGLE)
+                .build();
+    }
 }

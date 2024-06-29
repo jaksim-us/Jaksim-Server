@@ -12,6 +12,13 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.annotation.web.configurers.RequestCacheConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+
+import java.util.Arrays;
+import java.util.Collections;
+
+import static org.sopt.jaksim.global.common.Constants.ACTIVATE_PROFILE_URL;
+import static org.sopt.jaksim.global.common.Constants.WEB_SOCKET_SERVER_URL;
 
 @Configuration
 @RequiredArgsConstructor
@@ -21,11 +28,23 @@ public class SecurityConfig {
     private final CustomJwtAuthenticationEntryPoint customJwtAuthenticationEntryPoint;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
-
-    private static final String[] AUTH_WHITE_LIST = {"/api/v1/member"};
+    private static final String[] AUTH_WHITE_LIST = {ACTIVATE_PROFILE_URL,
+            WEB_SOCKET_SERVER_URL, "/login/**", "/api/v1/auth/**",
+            "/swagger-ui/**", "/swagger-resources/**"};
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http.cors((cors) -> cors
+                .configurationSource(request -> {
+                    CorsConfiguration configuration = new CorsConfiguration();
+                    configuration.setAllowedOriginPatterns(Arrays.asList("*"));
+                    configuration.setAllowedMethods(Collections.singletonList("*"));
+                    configuration.setAllowCredentials(true);
+                    configuration.setAllowedHeaders(Collections.singletonList("*"));
+                    configuration.setMaxAge(3600L);
+                    configuration.setExposedHeaders(Collections.singletonList("Authorization"));
+                    return configuration;
+                }));
         http.csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .requestCache(RequestCacheConfigurer::disable)
@@ -37,12 +56,13 @@ public class SecurityConfig {
                 });
 
 
-        http.authorizeHttpRequests(auth -> {
-                    auth.requestMatchers(AUTH_WHITE_LIST).permitAll();
-                    auth.anyRequest().authenticated();
-                })
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
+        http.authorizeHttpRequests((auth) -> auth
+            .requestMatchers(AUTH_WHITE_LIST).permitAll()
+            .anyRequest().authenticated()
+        )
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
+
+
 }

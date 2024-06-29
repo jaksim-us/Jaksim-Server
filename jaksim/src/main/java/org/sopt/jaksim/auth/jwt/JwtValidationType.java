@@ -1,4 +1,4 @@
-package org.sopt.jaksim.global.common.jwt;
+package org.sopt.jaksim.auth.jwt;
 
 public enum JwtValidationType {
     VALID_JWT,              // 유효한 JWT

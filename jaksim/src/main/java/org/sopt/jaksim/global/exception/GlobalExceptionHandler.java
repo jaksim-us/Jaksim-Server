@@ -1,6 +1,8 @@
-package org.sopt.jaksim.global.common;
+package org.sopt.jaksim.global.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import org.sopt.jaksim.global.common.ApiResponseUtil;
+import org.sopt.jaksim.global.common.BaseResponse;
 import org.sopt.jaksim.global.exception.ForbiddenException;
 import org.sopt.jaksim.global.exception.NotFoundException;
 import org.sopt.jaksim.global.exception.UnauthorizedException;
@@ -36,5 +38,17 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<BaseResponse<?>> handlerUnauthorizedException(UnauthorizedException e) {
         log.error(">>> handle: UnauthorizedException ", e);
         return ApiResponseUtil.failure(ErrorMessage.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(IOException.class)
+    protected ResponseEntity<BaseResponse<?>> handlerIOException(IOException e) {
+        log.error(">>> handle: IOException ", e);
+        return ApiResponseUtil.failure(ErrorMessage.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(OAuthException.class)
+    protected ResponseEntity<BaseResponse<?>> handlerOAuthException(OAuthException e) {
+        log.error(">>> handle: OAuthException ", e);
+        return ApiResponseUtil.failure(ErrorMessage.INVALID_GRANT_BY_OAUTH);
     }
 }

@@ -1,8 +1,10 @@
-package org.sopt.jaksim.global.common.jwt;
+package org.sopt.jaksim.auth.jwt;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
+import org.sopt.jaksim.global.exception.UnauthorizedException;
+import org.sopt.jaksim.global.message.ErrorMessage;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -64,6 +66,12 @@ public class JwtTokenProvider {
             return JwtValidationType.UNSUPPORTED_JWT_TOKEN;
         } catch (IllegalArgumentException ex) {
             return JwtValidationType.EMPTY_JWT;
+        }
+    }
+
+    public void equalsRefreshToken(String refreshToken, String storedRefreshToken) {
+        if(!refreshToken.equals(storedRefreshToken)) {
+            throw new UnauthorizedException(ErrorMessage.MISMATCH_REFRESH_TOKEN);
         }
     }
 
